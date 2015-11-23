@@ -1,4 +1,4 @@
-name: Kibana Workshop
+name: Docker initiation
 markdown: redcarpet
-pygments: true
+highlighter: pygments
 #baseurl: /docker-initiation
