@@ -184,7 +184,7 @@ $ sudo iptables -t nat -L
 
 <h3>Les volumes</h3>
 
-<p>Un container docker est par définition immutable. Cela signifie que si on souhaite en utiliser un pour héberger un site web,
+<p>Une image docker est par définition immutable. Cela signifie que si on souhaite en utiliser un pour héberger un site web,
 il faudrait créer un nouveau container dès qu'une modification du site aurait lieu. (Ceci n'est pas forcément une mauvaise solution).</p>
 
 <p>On va donc créer un répertoire sur la machine hôte pour stocker notre site web (par exemple en créant un fichier index.html bidon),
@@ -197,7 +197,7 @@ puis monter ce répertoire sur le container docker.</p>
 $ docker rm apache2BuildContainer
 $ mkdir www
 $ echo coucou > www/index.html
-$ docker run -t -i -p 8000:80 -v ~/www:/var/www/html --name="apache2BuildContainer" apache2 apache2ctl -f /etc/apache2/apache2.conf -e info -DFOREGROUND
+$ docker run -t -i -p 8000:80 -v $(pwd)/www/:/var/www/html --name="apache2BuildContainer" apache2 apache2ctl -f /etc/apache2/apache2.conf -e info -DFOREGROUND
 {% endhighlight %}
 </div>
 
