@@ -102,11 +102,15 @@ et la commande pour commiter un container est <em>docker commit</em></p>
 apache2ctl -f /etc/apache2/apache2.conf -e info -DFOREGROUND
 {% endhighlight %}
 
+<p>Remarque : la plateforme Openstack accéde à internet via un proxy. Pour que vos containers accédent à internet, vous pouvez ajouter la variable d'environnement <em>http_proxy</em> avec le paramétre suivant:</p>
+{% highlight bash %}
+-e "http_proxy=http://bluelagoon:22222"
+{% endhighlight %}
 <a href="https://docs.docker.com/reference/commandline/cli/#run">Lien vers la documentation</a>
 
 <div class = 'solution'>
 {% highlight bash %}
-$ docker run -i -t --name="apache2-build" ubuntu /bin/bash
+$ docker run -i -t --name="apache2-build" -e "http_proxy=http://bluelagoon:22222" ubuntu /bin/bash
 $ apt-get install apache2
 $ exit (on quitte le container)
 $ docker commit apache2-build apache2
