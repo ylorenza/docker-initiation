@@ -499,8 +499,12 @@ services:
     image: xebia/apache
     ports:
       - "8000:80"
+    depends_on:
+      - tomcat
+    restart: always
   tomcat:
     image: xebia/tomcat
+    restart: always
 {% endhighlight %}
 
 <a href= "https://docs.docker.com/compose/compose-file/">Lien vers la documentation</a>
