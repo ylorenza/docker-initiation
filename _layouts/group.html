@@ -7,6 +7,8 @@ js: ../javascripts/main.js
 <p>Dans ce workshop, vous aurez à votre disposition une instance amazon.
 Vous pouvez également utiliser directement votre machine, ou si vous le préférez, une machine virtuelle.</p>
 
+<h3>Instances Amazon</h3>
+
 <p>Toutes les machines utilisent la même clef ssh, et ont le même login <strong><em>ubuntu</em></strong>.</p>
 
 <p>Pour vous connecter à votre machine, placez le fichier <a href="../data/docker-janvier.pem">docker-janvier.pem</a>
@@ -22,6 +24,12 @@ $ chmod 400 docker-janvier.pem
 {% highlight bash %}
 $ ssh -i docker-janvier.pem ubuntu@docker-{{page.groupId}}.aws.xebiatechevent.info
 {% endhighlight %}
+
+<h3>Docker for Mac | Docker for Windows</h3>
+
+<p>Originellement disponible sur GNU/Linux, Docker propose une nouvelle intégration pour Mac et Windows. L'installation se fait en suivant <a href="https://www.docker.com/products/docker">ce lien</a>.</p>
+
+<p>Sur Mac et Windows il est impossible de lancer l'émulateur Android standard en même temps que Docker. Vous pouvez utiliser <a href="https://www.genymotion.com">Genymotion</a> ou <a href="https://developer.xamarin.com/releases/android/android-player/">Xamarin Android Player</a></p>
 
 <h2>Introduction à docker</h2>
 
