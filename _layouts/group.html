@@ -143,6 +143,17 @@ $ wget xxx.xxx.xxx.xxx
 {% endhighlight %}
 </div>
 
+<h3>Executer une commande dans un container docker en marche</h3>
+<p>Vous pouvez lancer une commande avec la commande exec, les options -i et -t sont supportées. Le container doit être en marche.</p>
+<div>
+{% highlight bash %}
+$ docker exec apache echo inside container !
+inside container !
+$ docker exec -it apache bash /
+root@5c4cab816d1e:/#
+{% endhighlight %}
+</div>
+
 <h3>Supprimer un container docker</h3>
 
 <p>Même éteint, un container docker reste présent pour être potentiellement réutilisé par la suite.
