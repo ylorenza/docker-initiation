@@ -148,9 +148,9 @@ $ wget xxx.xxx.xxx.xxx
 <p>Vous pouvez lancer une commande avec la commande exec, les options -i et -t sont supportées. Le container doit être en marche.</p>
 <div>
 {% highlight bash %}
-$ docker exec apache echo inside container !
+$ docker exec apache2BuildContainer echo inside container !
 inside container !
-$ docker exec -it apache bash /
+$ docker exec -it apache2BuildContainer bash
 root@5c4cab816d1e:/#
 {% endhighlight %}
 </div>
