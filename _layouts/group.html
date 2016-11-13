@@ -430,40 +430,42 @@ docker exec apache cat /etc/hosts
 {% endhighlight %}
 
 
-<h2>Orchestration avec Fig</h2>
+<h2>Orchestration avec Docker Compose</h2>
 
-<p>Fig est un outil permettant de définir l'ensemble des services qui composent une application au sein d'un même fichier de description,
+<p>Docker Compose est un outil permettant de définir l'ensemble des services qui composent une application au sein d'un même fichier de description,
 afin de pouvoir les lancer conjointement au sein d'un environnement isolé.</p>
 
-<h3>Installation de Fig</h3>
+<h3>Installation de Docker Compose</h3>
 
-<p>Fig se présente sous la forme d'un binaire qui peut être installé de manière très simple avec la commande suivante :</p>
+<p>Docker Compose se présente sous la forme d'un binaire qui peut être installé de manière très simple avec la commande suivante :</p>
 
-{% highlight bash %}
-$ curl -L https://github.com/docker/fig/releases/download/1.0.1/fig-`uname -s`-`uname -m` > /usr/local/bin/fig
-$ chmod +x /usr/local/bin/fig
-$ fig --version
-fig 1.0.1
-{% endhighlight %}
-
-<h3>Utilisation de Fig</h3>
-
-<p>Créer un fichier <em>fig.yml</em> pour stocker les propriétés d'éxécution de votre application :</p>
+<p>Sur Windows et Mac OS X, Docker Compose est installé automatiquement</p>
 
 {% highlight bash %}
-web:
-  image: xebia/apache
-  ports:
-    - "8000:80"
-  links:
-    - tomcat:tomcat
-tomcat:
-  image: xebia/tomcat
+$ curl -L https://github.com/docker/compose/releases/download/1.8.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+$ chmod +x /usr/local/bin/docker-compose
+$ docker-compose --version
+docker-compose version 1.8.0, build f3628c7
 {% endhighlight %}
 
-<a href= "http://www.fig.sh/yml.html">Lien vers la documentation</a>
+<h3>Utilisation de Docker Compose</h3>
 
-<p>Il ne vous reste plus qu'à lancer la commande <em>fig up</em> et regarder fig construire puis lancer votre application
+<p>Créer un fichier <em>docker-compose.yml</em> pour stocker les propriétés d'éxécution de votre application :</p>
+
+{% highlight bash %}
+version: '2'
+services:
+  web:
+    image: xebia/apache
+    ports:
+      - "8000:80"
+  tomcat:
+    image: xebia/tomcat
+{% endhighlight %}
+
+<a href= "https://docs.docker.com/compose/compose-file/">Lien vers la documentation</a>
+
+<p>Il ne vous reste plus qu'à lancer la commande <em>docker-compose up</em> et regarder docker-compose construire puis lancer votre application
 avec les bons paramètres, notamment les liens entre vos différents containers</p>
 <p>Remarque: n'oubliez pas de détruire les containers déjà crées afin de libérer les ports de la machine hôte et les noms de containers</p>
 {% highlight bash %}
