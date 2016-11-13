@@ -189,7 +189,7 @@ il faudrait créer un nouveau container dès qu'une modification du site aurait 
 <p>On va donc créer un répertoire sur la machine hôte pour stocker notre site web (par exemple en créant un fichier index.html bidon),
 puis monter ce répertoire sur le container docker.</p>
 
-<a href="https://docs.docker.com/userguide/dockervolumes/">Lien vers la documentation</a>
+<a href="https://docs.docker.com/engine/tutorials/dockervolumes/">Lien vers la documentation</a>
 
 <div class = 'solution'>
 {% highlight bash %}
@@ -197,6 +197,26 @@ $ docker rm apache2BuildContainer
 $ mkdir www
 $ echo coucou > www/index.html
 $ docker run -t -i -p 8000:80 -v ~/www:/var/www/html --name="apache2BuildContainer" apache2 apache2ctl -f /etc/apache2/apache2.conf -e info -DFOREGROUND
+{% endhighlight %}
+</div>
+
+<p>Il est aussi possible de lier un volume nommé au lieu d'indiquer un chemin absolu fixe sur la machine hôte, dans ce cas docker s'occupe de créer automatiquement un dossier sur la machine hôte.</p>
+
+<div>
+{% highlight bash %}
+$ docker run -v test:/test ubuntu sh -c "echo Hello > /test/file"
+$ docker volume inspect test
+[
+    {
+        "Name": "test",
+        "Driver": "local",
+        "Mountpoint": "/var/lib/docker/volumes/test/_data",
+        "Labels": null,
+        "Scope": "local"
+    }
+]
+$ sudo cat /var/lib/docker/volumes/test/_data/file
+Hello
 {% endhighlight %}
 </div>
 
