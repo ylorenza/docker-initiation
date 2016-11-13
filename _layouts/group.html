@@ -114,6 +114,7 @@ apache2ctl -f /etc/apache2/apache2.conf -e info -DFOREGROUND
 <div class = 'solution'>
 {% highlight bash %}
 $ docker run -i -t --name="apache2-build" ubuntu /bin/bash
+$ apt-get update
 $ apt-get install apache2
 $ exit (on quitte le container)
 $ docker commit apache2-build apache2
