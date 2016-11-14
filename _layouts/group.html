@@ -99,26 +99,26 @@ $ docker ps -a
 
 <h3>Création d'une image docker</h3>
 
-<p>Nous allons maintenant essayer de créer une image docker basée sur Ubuntu et contenant un serveur apache
+<p>Nous allons maintenant essayer de créer une image docker basée sur Ubuntu et contenant un serveur nginx
 (sans ce baser sur une image existante sur le dockerhub). Pour cela, vous allez lancer votre image docker avec un bash en mode interactif
 (option <em>-it</em>). Pour information, la commande <em>docker ps</em> vous donne l'identifiant unique du container,
 et la commande pour commiter un container est <em>docker commit</em></p>
-<p>Remarque : la commande pour lancer apache en foreground est :</p>
+<p>Remarque : la commande pour lancer nginx en foreground avec du log est :</p>
 
 {% highlight bash %}
-apache2ctl -f /etc/apache2/apache2.conf -e info -DFOREGROUND
+nginx -g "daemon off; error_log /dev/stdout debug;"
 {% endhighlight %}
 
 <a href="https://docs.docker.com/reference/commandline/cli/#run">Lien vers la documentation</a>
 
 <div class = 'solution'>
 {% highlight bash %}
-$ docker run -i -t --name="apache2-build" ubuntu /bin/bash
+$ docker run -i -t --name="nginx-build" ubuntu /bin/bash
 $ apt-get update
-$ apt-get install apache2
+$ apt-get install nginx
 $ exit (on quitte le container)
-$ docker commit apache2-build apache2
-$ docker run -t -i --name="apache2BuildContainer" apache2 apache2ctl -f /etc/apache2/apache2.conf -e info -DFOREGROUND
+$ docker commit nginx-build nginx
+$ docker run -t -i --name="nginxBuildContainer" nginx nginx -g "daemon off; error_log /dev/stdout debug;"
 {% endhighlight %}
 </div>
 
@@ -139,7 +139,7 @@ et de récuperer la page d'accueil avec une commande type curl ou wget</p>
 
 <div class = 'solution'>
 {% highlight bash %}
-$ docker inspect apache2BuildContainer | grep IPAddress
+$ docker inspect nginxBuildContainer | grep IPAddress
 $ wget xxx.xxx.xxx.xxx
 {% endhighlight %}
 </div>
@@ -148,12 +148,20 @@ $ wget xxx.xxx.xxx.xxx
 <p>Vous pouvez lancer une commande avec la commande exec, les options -i et -t sont supportées. Le container doit être en marche.</p>
 <div>
 {% highlight bash %}
-$ docker exec apache2BuildContainer echo inside container !
+$ docker exec nginxBuildContainer echo inside container !
 inside container !
-$ docker exec -it apache2BuildContainer bash
+$ docker exec -it nginxBuildContainer bash
 root@5c4cab816d1e:/#
 {% endhighlight %}
 </div>
+
+<h3>Eteindre un container docker</h3>
+
+<p>Vous pouvez éteindre un container avec docker stop ou docker kill. docker stop envoie un SIGTERM puis SIGKILL tandis que docker kill utilise directement SIGKILL</p>
+
+{% highlight bash %}
+$ docker stop nginxBuildContainer
+{% endhighlight %}
 
 <h3>Supprimer un container docker</h3>
 
@@ -161,7 +169,7 @@ root@5c4cab816d1e:/#
 Pour supprimer un container, on peut utiliser la commande :</p>
 
 {% highlight bash %}
-$ docker rm apache2BuildContainer
+$ docker rm nginxBuildContainer
 {% endhighlight %}
 
 <h3>Gérer la mémoire et le CPU</h3>
@@ -170,8 +178,8 @@ $ docker rm apache2BuildContainer
 
 <div class = 'solution'>
 {% highlight bash %}
-$ docker rm apache2BuildContainer
-$ docker run -m 5m -t -i --name apache2BuildContainer apache2 apache2ctl -f /etc/apache2/apache2.conf -e info -DFOREGROUND
+$ docker rm nginxBuildContainer
+$ docker run -m 5m -t -i --name nginxBuildContainer nginx cat /sys/fs/cgroup/memory/memory.limit_in_bytes
 {% endhighlight %}
 </div>
 
@@ -190,8 +198,8 @@ $ wget localhost:8000
 
 <div class = 'solution'>
 {% highlight bash %}
-$ docker rm apache2BuildContainer
-$ docker run -t -i -p 8000:80 --name="apache2BuildContainer" apache2 apache2ctl -f /etc/apache2/apache2.conf -e info -DFOREGROUND
+$ docker rm nginxBuildContainer
+$ docker run -t -i -p 8000:80 --name="nginxBuildContainer" nginx nginx -g "daemon off; error_log /dev/stdout debug;"
 {% endhighlight %}
 </div>
 
@@ -213,10 +221,10 @@ puis monter ce répertoire sur le container docker.</p>
 
 <div class = 'solution'>
 {% highlight bash %}
-$ docker rm apache2BuildContainer
+$ docker rm nginxBuildContainer
 $ mkdir www
 $ echo coucou > www/index.html
-$ docker run -t -i -p 8000:80 -v ~/www:/var/www/html --name="apache2BuildContainer" apache2 apache2ctl -f /etc/apache2/apache2.conf -e info -DFOREGROUND
+$ docker run -t -i -p 8000:80 -v ~/www:/var/www/html --name="nginxBuildContainer" nginx nginx -g "daemon off; error_log /dev/stdout debug;"
 {% endhighlight %}
 </div>
 
@@ -250,9 +258,9 @@ et à partir de celui-ci crée une image docker. Cette image peut ensuite être 
 
 <a href= "https://docs.docker.com/reference/builder">Lien vers la documentation</a>
 
-<h3>Création de notre container apache</h3>
+<h3>Création de notre container nginx</h3>
 
-<p>En nous basant sur ce que nous avons vu dans la première partie, nous allons créer un container contenant un serveur apache.
+<p>En nous basant sur ce que nous avons vu dans la première partie, nous allons créer un container contenant un serveur nginx.
 Pour commencer, nous allons lui spécifier à partir de quelle image de base nous souhaitons travailler.
 Dans notre cas, il s'agit toujours d'une image Ubuntu</p>
 
@@ -265,7 +273,7 @@ FROM ubuntu
 <p>Une fois cela fait, vous pouvez lancer la commande suivante pour créer votre image. L'option -t permet de donner un nom à cet image</p>
 
 {% highlight bash %}
-$ docker build -t="xebia/apache" .
+$ docker build -t="xebia/nginx" .
 {% endhighlight %}
 
 <p>Vous pouvez spécifier si vous le souhaiter le nom de la personne qui maintient cette image.
@@ -279,7 +287,7 @@ MAINTAINER Xebia
 {% endhighlight %}
 </div>
 
-<p>Maintenant, nous allons indiquer à docker d'intégrer un serveur apache à notre image (lors du docker build).</p>
+<p>Maintenant, nous allons indiquer à docker d'intégrer un serveur nginx à notre image (lors du docker build).</p>
 
 <div class = 'solution'>
 {% highlight bash %}
@@ -287,13 +295,13 @@ FROM ubuntu
 
 MAINTAINER Xebia
 
-RUN apt-get update && apt-get -y install apache2 && apt-get clean
+RUN apt-get update && apt-get -y install nginx && apt-get clean
 {% endhighlight %}
 </div>
 
 <p>On peut également spécifier dans le Dockerfile des variables d'environnement qui pourront être réutilisées par la suite.
-Définissez les variables d'environnement <em>APACHE_RUN_USER</em> et <em>APACHE_RUN_GROUP</em> avec la valeur <em>www-data</em>
-afin de lancer par la suite notre serveur apache avec des droits restreints.
+Définissez les variables d'environnement <em>NGINX_RUN_USER</em> et <em>NGINX_RUN_GROUP</em> avec la valeur <em>www-data</em>
+afin de lancer par la suite notre serveur nginx avec des droits restreints.
 (Le fait d'avoir un processus isolé dans un container ne veut absolument pas dire que l'on peut tout lancer en root.)</p>
 
 <div class = 'solution'>
@@ -302,10 +310,10 @@ FROM ubuntu
 
 MAINTAINER Xebia
 
-RUN apt-get update && apt-get -y install apache2 && apt-get clean
+RUN apt-get update && apt-get -y install nginx && apt-get clean
 
-ENV APACHE_RUN_USER www-data
-ENV APACHE_RUN_GROUP www-data
+ENV NGINX_RUN_USER www-data
+ENV NGINX_RUN_GROUP www-data
 {% endhighlight %}
 </div>
 
@@ -317,10 +325,10 @@ FROM ubuntu
 
 MAINTAINER Xebia
 
-RUN apt-get update && apt-get -y install apache2 && apt-get clean
+RUN apt-get update && apt-get -y install nginx && apt-get clean
 
-ENV APACHE_RUN_USER www-data
-ENV APACHE_RUN_GROUP www-data
+ENV NGINX_RUN_USER www-data
+ENV NGINX_RUN_GROUP www-data
 
 EXPOSE 80
 {% endhighlight %}
@@ -334,89 +342,109 @@ FROM ubuntu
 
 MAINTAINER Xebia
 
-RUN apt-get update && apt-get -y install apache2 && apt-get clean
+RUN apt-get update && apt-get -y install nginx && apt-get clean
 
-ENV APACHE_RUN_USER www-data
-ENV APACHE_RUN_GROUP www-data
+ENV NGINX_RUN_USER www-data
+ENV NGINX_RUN_GROUP www-data
 
 EXPOSE 80
-ENTRYPOINT ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
+ENTRYPOINT ["/usr/sbin/nginx", "-g", "daemon off; error_log /dev/stdout debug;"]
 {% endhighlight %}
 </div>
 
-<p>Vous pouvez maintenant lancer votre container apache grâce à la commande :</p>
+<p>Vous pouvez maintenant lancer votre container nginx grâce à la commande :</p>
 
 {% highlight bash %}
-$ docker run -d -p 8000:80 --name="apache2" xebia/apache
+$ docker run -d -p 8000:80 --name="nginx" xebia/nginx
 {% endhighlight %}
 
 <h2>Communication inter-container</h2>
 
 <p>Dans cette partie nous allons créer deux container avec pour objectif d'établir une connexion entre ces-derniers.
-Nous allons créer deux containers : l'un contenant un serveur apache, et l'autre contenant un serveur Tomcat.
+Nous allons créer deux containers : l'un contenant un serveur nginx, et l'autre contenant un serveur NodeJS.
 Une fois ces deux serveurs créés, nous verrons comment les faire communiquer entre eux.
-Vous pourrez utiliser l'image créée dans la partie précédente pour démarrer un conteneur apache</p>
+Vous pourrez utiliser l'image créée dans la partie précédente pour démarrer un conteneur nginx</p>
 
-<h3>Création de notre container Tomcat</h3>
+<h3>Création de notre container NodeJS</h3>
 
-<p>Vous allez maintenant procéder de manière similaire pour créer une image basée sur Ubuntu et contenant un serveur Tomcat.
-Pensez à exposer le port 8080 et à ne pas lancer Tomcat en arrière plan.</p>
+<p>Vous allez maintenant procéder de manière similaire pour créer une image basée sur Ubuntu et contenant un serveur NodeJS.
+Pensez à exposer le port 8080 et à ne pas lancer NodeJS en arrière plan.</p>
 
-<p>Commencez par créer un nouveau Dockerfile pour construire l'image tomcat</p>
+<p>Commencez par créer un nouveau Dockerfile pour construire l'image NodeJS</p>
+<p>Nous allons lancer Nodejs avec ce script pour qu'il crée un serveur HTTP</p>
+
+{% highlight bash %}
+CMD echo 'var http=require("http"),server=http.createServer(function(a,b){b.writeHead(200,{"Content-Type":"text/html"}),b.write("Hello from NodeJS !"),b.end()});server.listen(8080);' | nodejs
+{% endhighlight %}
+
 <div class = 'solution'>
 {% highlight bash %}
 FROM ubuntu
 
 MAINTAINER Xebia
 
-RUN apt-get update && apt-get -y install tomcat7 && apt-get clean
+RUN apt-get update && apt-get -y install nodejs && apt-get clean
 
 EXPOSE 8080
-CMD service tomcat7 start & touch foreground && tail -f foreground
+CMD echo 'var http=require("http"),server=http.createServer(function(a,b){b.writeHead(200,{"Content-Type":"text/html"}),b.write("Hello from NodeJS !"),b.end()});server.listen(8080);' | nodejs
 {% endhighlight %}
 </div>
 
-<p>Une fois le Dockerfile créé, vous pouvez construire votre image tomcat puis lancer un container :</p>
+<p>Une fois le Dockerfile créé, vous pouvez construire votre image nodejs puis lancer un container :</p>
 
 <div class = 'solution'>
 {% highlight bash %}
-$ docker build -t="xebia/tomcat" .
-$ docker run -d -p 8080:8080 --name tomcat xebia/tomcat
+$ docker build -t="xebia/nodejs" .
+$ docker run -d -p 8080:8080 --name nodejs xebia/nodejs
 {% endhighlight %}
 </div>
 
 
-<p>Utilisez wget, curl ou encore votre navigateur pour tester que tomcat est bien démarré :</p>
+<p>Utilisez wget, curl ou encore votre navigateur pour tester que nodejs est bien démarré :</p>
 {% highlight bash %}
 $ curl localhost:8080
 {% endhighlight %}
 
-<h3>Lier le container apache avec le container Tomcat</h3>
+<h3>Lier le container nginx avec le container NodeJS</h3>
 
 <p>Maintenant que nous avons créé nos containers, nous allons essayer de les lier entre eux.
-Pour cela, nous allons commencer par modifier notre image apache afin de la transformer en proxy,
-afin de rediriger les requêtes à destination du serveur apache vers le Tomcat.</p>
+Pour cela, nous allons commencer par modifier notre image nginx afin de la transformer en proxy,
+afin de rediriger les requêtes à destination du serveur nginx vers le NodeJS.</p>
 
-<p>Fichier apache-config.conf</p>
+<p>Fichier nginx.conf</p>
 
 {% highlight bash %}
-<VirtualHost *:80>
-  ProxyPass / http://tomcat:8080
-  ProxyPassReverse / http://tomcat:8080
 
-  <Location />
-    Order allow,deny
-    Allow from all
-  </Location>
+worker_processes  1;
+daemon off;
+error_log /dev/stdout debug;
 
-</VirtualHost>
+events {
+  worker_connections 1024;
+}
+
+http {
+  index    index.html;
+
+  default_type application/octet-stream;
+  sendfile     on;
+  tcp_nopush   on;
+
+  server {
+    listen       80;
+    root         html;
+
+    location / {
+      proxy_pass http://nodejs:8080;
+    }
+  }
+}
 {% endhighlight %}
 
 
-<p>Pour construire une nouvelle image avec un Apache configuré en proxy, vous devez enrichir le Dockerfile existant :
+<p>Pour construire une nouvelle image avec un Nginx configuré en proxy, vous devez enrichir le Dockerfile existant :
   <ul>
-    <li>Activer les modules proxy et proxy_http (commande a2enmod)</li>
-    <li>Remplacer le fichier <strong><em>/etc/apache2/sites-enabled/000-default.conf</em></strong> par le fichier <strong><em>apache-config.conf</em></strong> fourni</li>
+    <li>Créer <strong><em>/etc/nginx.conf</em></strong> avec le fichier <strong><em>nginx.conf</em></strong> fourni</li>
 </ul>
 <a href="https://docs.docker.com/reference/builder/#add">Lien vers la documentation</a>
 </p>
@@ -428,21 +456,16 @@ FROM ubuntu
 
 MAINTAINER Xebia
 
-RUN apt-get update && apt-get -y install apache2 && apt-get clean
+RUN apt-get update && apt-get -y install nginx && apt-get clean
 
-ENV APACHE_RUN_USER www-data
-ENV APACHE_RUN_GROUP www-data
+ENV NGINX_RUN_USER www-data
+ENV NGINX_RUN_GROUP www-data
 
 EXPOSE 80
 
-# Enable proxy and proxy_http mod
-RUN a2enmod proxy proxy_http
+ADD nginx.conf /etc/nginx.conf
 
-# Update the default apache site with the config we created.
-ADD apache-config.conf /etc/apache2/sites-enabled/000-default.conf
-
-CMD apache2ctl restart
-CMD apache2ctl -D FOREGROUND
+CMD nginx -c /etc/nginx.conf
 {% endhighlight %}
 </div>
 
@@ -451,23 +474,72 @@ CMD apache2ctl -D FOREGROUND
 
 <div class="solution">
 {% highlight bash %}
-$ docker build -t="xebia/apache" .
-$ docker run -d -p 8000:80 --name apache --link tomcat:tomcat xebia/apache
+$ docker kill nginx
+$ docker rm nginx
+$ docker build -t="xebia/nginx" .
+$ docker run -d -p 8000:80 --name nginx --link nodejs:nodejs xebia/nginx
 {% endhighlight %}
 </div>
 
-<p>Rendez-vous maintenant à l'adresse du serveur apache, et la page d'accueil de tomcat doit s'afficher.</p>
+<p>Rendez-vous maintenant à l'adresse du serveur nginx, et la page servie par le nodejs doit s'afficher.</p>
 
 {% highlight bash %}
 $ curl localhost:8000
 {% endhighlight %}
 
-<p>Vous remarquerez que dans la configuration du apache nous redirigeons le trafic vers http://tomcat/.
-Cela est possible car docker a ajouté une entrée dans le /etc/hosts de notre container apache, pour l'observer :</p>
+<p>Vous remarquerez que dans la configuration du nginx nous redirigeons le trafic vers http://nodejs/.
+Cela est possible car docker a ajouté une entrée dans le /etc/hosts de notre container nginx, pour l'observer :</p>
 
 {% highlight bash %}
-docker exec apache cat /etc/hosts
+docker exec nginx cat /etc/hosts
 {% endhighlight %}
+
+<h3>Mise à niveau de l'image NodeJS</h3>
+
+<p>Maintenant que vous savez ajouter un fichier à vos images. Mettez à jour l'image nodejs pour utiliser ce fichier app.js:</p>
+
+<div>
+{% highlight bash %}
+var http = require("http"),
+    server = http.createServer(function(a, b) {
+        b.writeHead(200, {
+            "Content-Type": "text/html"
+        })
+        b.write("Hello from NodeJS from file!");
+        b.end()
+    });
+server.listen(8080);
+{% endhighlight %}
+</div>
+
+<p>Mettons à jour le Dockerfile</p>
+
+<div>
+{% highlight bash %}
+FROM ubuntu
+
+MAINTAINER Xebia
+
+RUN apt-get update && apt-get -y install nodejs && apt-get clean
+
+EXPOSE 8080
+RUN mkdir /app
+ADD app.js /app/app.js
+CMD nodejs /app/app.js
+{% endhighlight %}
+</div>
+
+<p>On démarre la nouvelle image NodeJS</p>
+
+
+<div>
+{% highlight bash %}
+$ docker kill nodejs
+$ docker rm nodejs
+$ docker build -t="xebia/nodejs" .
+$ docker run -d -p 8080:8080 --name nodejs xebia/nodejs
+{% endhighlight %}
+</div>
 
 
 <h2>Orchestration avec Docker Compose</h2>
@@ -496,14 +568,14 @@ docker-compose version 1.8.0, build f3628c7
 version: '2'
 services:
   web:
-    image: xebia/apache
+    image: xebia/nginx
     ports:
       - "8000:80"
     depends_on:
-      - tomcat
+      - nodejs
     restart: always
-  tomcat:
-    image: xebia/tomcat
+  nodejs:
+    image: xebia/nodejs
     restart: always
 {% endhighlight %}
 
