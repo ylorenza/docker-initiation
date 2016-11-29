@@ -9,20 +9,12 @@ Vous pouvez également utiliser directement votre machine, ou si vous le préfé
 
 <h3>Instances Amazon</h3>
 
-<p>Toutes les machines utilisent la même clef ssh, et ont le même login <strong><em>ubuntu</em></strong>.</p>
-
-<p>Pour vous connecter à votre machine, placez le fichier <a href="../data/docker-janvier.pem">docker-janvier.pem</a>
-ou le fichier <a href="../data/docker-janvier.ppk">docker-janvier.ppk</a> pour les utilisateurs Windows,
-dans votre répertoire courant (la clef sera révoquée après le workshop). N'oubliez pas de changer les permissions sur le fichier :</p>
-
-{% highlight bash %}
-$ chmod 400 docker-janvier.pem
-{% endhighlight %}
+<p>Toutes les machines ont le même login <strong><em>docker</em></strong> et le même passord <strong><em>training</em></strong>.</p>
 
 <p>Pour tester l'installation, et vous connecter à la première instance, tapez la commande : </p>
 
 {% highlight bash %}
-$ ssh -i docker-janvier.pem ubuntu@docker-{{page.groupId}}.aws.xebiatechevent.info
+$ ssh docker@docker-{{page.groupId}}.aws.xebiatechevent.info
 {% endhighlight %}
 
 <h3>Docker for Mac | Docker for Windows</h3>
@@ -41,7 +33,7 @@ $ ssh -i docker-janvier.pem ubuntu@docker-{{page.groupId}}.aws.xebiatechevent.in
 
 <p>Pour commencer à jouer avec docker, nous allons commencer par chercher une image de base.
 Les images de base correspondent plus ou moins à des distributions linux sans kernel.
-Pour voir la liste des images disponibles, tapez la commande :</p>
+Pour voir la liste des images disponibles localement, tapez la commande :</p>
 
 {% highlight bash %}
 $ docker images
@@ -115,7 +107,7 @@ nginx -g "daemon off; error_log /dev/stdout debug;"
 {% highlight bash %}
 $ docker run -i -t --name="nginx-build" ubuntu /bin/bash
 $ apt-get update
-$ apt-get install nginx
+$ apt-get install -y nginx
 $ exit (on quitte le container)
 $ docker commit nginx-build nginx
 $ docker run -t -i --name="nginxBuildContainer" nginx nginx -g "daemon off; error_log /dev/stdout debug;"

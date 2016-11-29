@@ -1,12 +1,28 @@
-#!/bin/sh
+#!/bin/bash
+CWD=$(cd $(dirname $0);pwd)
+
+function usage {
+    echo "Usage: $0 <start ou stop ou plan> ";exit 1
+}
 
 if [ $# -lt 1 ];then
-  echo "Usage: spawn.sh <private_key>"
-  exit 1
+    usage
 fi
 
-terraform apply && (
-  export ANSIBLE_HOST_KEY_CHECKING=False
-  node terraform2ansible.js terraform.tfstate private/inventory
-  ansible-playbook -i private/inventory --private-key=$1 docker.playbook
-)
+ACTION=$1
+
+case $ACTION in
+    plan)
+        terraform plan
+    ;;
+    start)
+        terraform apply
+    ;;
+    stop)
+
+        terraform destroy
+    ;;
+    *)
+        usage
+    ;;
+esac
