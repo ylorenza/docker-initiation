@@ -180,7 +180,7 @@ $ docker run -m 5m -t -i --name nginxBuildContainer nginx cat /sys/fs/cgroup/mem
 
 <p>Pouvoir accéder à un container via son adresse IP est bien, mais dans la majorité des cas, on aura uniquement accès à l'adresse IP de l'hôte.
 Pour contourner se problème, docker permet de faire du forwarding de port entre le container et l'hôte.
-Rediriger le port 8000 du container vers le port 80 du la machine hôte. Pour tester, vous pouvez utiliser la commande :</p>
+Rediriger le port 80 du container vers le port 8000 du la machine hôte. Pour tester, vous pouvez utiliser la commande :</p>
 
 {% highlight bash %}
 $ wget localhost:8000
